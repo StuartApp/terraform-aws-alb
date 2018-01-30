@@ -61,11 +61,10 @@ resource "aws_alb_target_group" "target_group" {
 }
 
 resource "aws_alb_listener" "frontend_http" {
-  count             = "${var.create_default_listeners ? 1 : 0}"
+  count             = "${var.create_default_listeners && contains(var.alb_protocols, "HTTP") ? 1 : 0}"
   load_balancer_arn = "${var.enable_logging ? aws_alb.with_logs.0.arn : aws_alb.without_logs.0.arn}"
   port              = "80"
   protocol          = "HTTP"
-  count             = "${contains(var.alb_protocols, "HTTP") ? 1 : 0}"
 
   default_action {
     target_group_arn = "${aws_alb_target_group.target_group.id}"
@@ -74,13 +73,12 @@ resource "aws_alb_listener" "frontend_http" {
 }
 
 resource "aws_alb_listener" "frontend_https" {
-  count             = "${var.create_default_listeners ? 1 : 0}"
+  count             = "${var.create_default_listeners && contains(var.alb_protocols, "HTTPS") ? 1 : 0}"
   load_balancer_arn = "${var.enable_logging ? aws_alb.with_logs.0.arn : aws_alb.without_logs.0.arn}"
   port              = "443"
   protocol          = "HTTPS"
   certificate_arn   = "${var.certificate_arn}"
   ssl_policy        = "${var.security_policy}"
-  count             = "${contains(var.alb_protocols, "HTTPS") ? 1 : 0}"
 
   default_action {
     target_group_arn = "${aws_alb_target_group.target_group.id}"

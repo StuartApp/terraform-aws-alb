@@ -1,3 +1,8 @@
+variable "create_default_listeners" {
+  description = "Boolean determining if default listeners (HTTP and HTTPS) should be created."
+  default     = true
+}
+
 variable "alb_is_internal" {
   description = "Boolean determining if the ALB is internal or externally facing."
   default     = false

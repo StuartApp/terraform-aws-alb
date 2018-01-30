@@ -25,7 +25,7 @@ resource "aws_alb" "without_logs" {
 }
 
 resource "aws_s3_bucket" "log_bucket" {
-  count         = "${var.enable_logging ? 0 : 1}"
+  count         = "${var.enable_logging ? 1 : 0}"
   bucket        = "${var.log_bucket_name}"
   policy        = "${var.bucket_policy == "" ? data.aws_iam_policy_document.bucket_policy.json : var.bucket_policy}"
   force_destroy = "${var.force_destroy_log_bucket}"

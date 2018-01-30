@@ -50,6 +50,7 @@ resource "aws_alb_target_group" "target_group" {
 }
 
 resource "aws_alb_listener" "frontend_http" {
+  count             = "${var.create_default_listeners ? 1 : 0}"
   load_balancer_arn = "${aws_alb.main.arn}"
   port              = "80"
   protocol          = "HTTP"
@@ -62,6 +63,7 @@ resource "aws_alb_listener" "frontend_http" {
 }
 
 resource "aws_alb_listener" "frontend_https" {
+  count             = "${var.create_default_listeners ? 1 : 0}"
   load_balancer_arn = "${aws_alb.main.arn}"
   port              = "443"
   protocol          = "HTTPS"

@@ -1,4 +1,5 @@
-resource "aws_alb" "main" {
+resource "aws_alb" "with_logs" {
+  count           = "${var.enable_logging ? 1 : 0}"
   name            = "${var.alb_name}"
   subnets         = ["${var.subnets}"]
   security_groups = ["${var.alb_security_groups}"]
@@ -14,7 +15,17 @@ resource "aws_alb" "main" {
   depends_on = ["aws_s3_bucket.log_bucket"]
 }
 
+resource "aws_alb" "without_logs" {
+  count           = "${var.enable_logging ? 0 : 1}"
+  name            = "${var.alb_name}"
+  subnets         = ["${var.subnets}"]
+  security_groups = ["${var.alb_security_groups}"]
+  internal        = "${var.alb_is_internal}"
+  tags            = "${merge(var.tags, map("Name", var.alb_name))}"
+}
+
 resource "aws_s3_bucket" "log_bucket" {
+  count         = "${var.enable_logging ? 0 : 1}"
   bucket        = "${var.log_bucket_name}"
   policy        = "${var.bucket_policy == "" ? data.aws_iam_policy_document.bucket_policy.json : var.bucket_policy}"
   force_destroy = "${var.force_destroy_log_bucket}"
@@ -50,7 +61,7 @@ resource "aws_alb_target_group" "target_group" {
 }
 
 resource "aws_alb_listener" "frontend_http" {
-  load_balancer_arn = "${aws_alb.main.arn}"
+  load_balancer_arn = "${var.enable_logging ? aws_alb.with_logs.0.arn : aws_alb.without_logs.0.arn}"
   port              = "80"
   protocol          = "HTTP"
   count             = "${contains(var.alb_protocols, "HTTP") ? 1 : 0}"
@@ -62,7 +73,7 @@ resource "aws_alb_listener" "frontend_http" {
 }
 
 resource "aws_alb_listener" "frontend_https" {
-  load_balancer_arn = "${aws_alb.main.arn}"
+  load_balancer_arn = "${var.enable_logging ? aws_alb.with_logs.0.arn : aws_alb.without_logs.0.arn}"
   port              = "443"
   protocol          = "HTTPS"
   certificate_arn   = "${var.certificate_arn}"

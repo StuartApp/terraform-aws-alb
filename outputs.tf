@@ -1,21 +1,21 @@
 output "alb_arn" {
   description = "ARN of the ALB itself. Useful for debug output, for example when attaching a WAF."
-  value       = "${var.enable_logging ? aws_alb.with_logs.0.arn : aws_alb.without_logs.0.arn}"
+  value       = "${element(concat(aws_alb.with_logs.*.arn, aws_alb.without_logs.*.arn ,list("")), 0)}"
 }
 
 output "alb_arn_suffix" {
   description = "ARN suffix of our ALB - can be used with CloudWatch"
-  value       = "${var.enable_logging ? aws_alb.with_logs.0.arn_suffix : aws_alb.without_logs.0.arn_suffix}"
+  value       = "${element(concat(aws_alb.with_logs.*.arn_suffix, aws_alb.without_logs.*.arn_suffix ,list("")), 0)}"
 }
 
 output "alb_dns_name" {
   description = "The DNS name of the ALB presumably to be used with a friendlier CNAME."
-  value       = "${var.enable_logging ? aws_alb.with_logs.0.dns_name : aws_alb.without_logs.0.dns_name}"
+  value       = "${element(concat(aws_alb.with_logs.*.dns_name, aws_alb.without_logs.*.dns_name, list("")), 0)}"
 }
 
 output "alb_id" {
   description = "The ID of the ALB we created."
-  value       = "${var.enable_logging ? aws_alb.with_logs.0.id : aws_alb.without_logs.0.id}"
+  value       = "${element(concat(aws_alb.with_logs.*.id, aws_alb.without_logs.*.id ,list("")), 0)}"
 }
 
 output "alb_listener_https_arn" {
@@ -40,7 +40,7 @@ output "alb_listener_http_id" {
 
 output "alb_zone_id" {
   description = "The zone_id of the ALB to assist with creating DNS records."
-  value       = "${var.enable_logging ? aws_alb.with_logs.0.zone_id : aws_alb.without_logs.0.zone_id}"
+  value       = "${element(concat(aws_alb.with_logs.*.zone_id, aws_alb.without_logs.*.zone_id ,list("")), 0)}"
 }
 
 output "principal_account_id" {
